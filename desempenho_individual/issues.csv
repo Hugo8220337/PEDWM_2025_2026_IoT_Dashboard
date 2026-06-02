@@ -1,0 +1,49 @@
+Epic,Task,Type,Assignee,Status,StoryPoints
+Simulator,Setup MQTT client and broker connection with Sparkplug B LWT,Simulator,Diogo,Done,3
+Simulator,Implement JSON config loading for nodes and sensors,Simulator,Diogo,Done,2
+Simulator,Implement NBIRTH message publishing on connect,Simulator,Diogo,Done,3
+Simulator,Implement periodic NDATA publishing per sensor interval,Simulator,Diogo,Done,5
+Simulator,Implement NDEATH message on shutdown,Simulator,Diogo,Done,2
+Simulator,Support multi-node multi-thread simulation,Simulator,Diogo,Done,5
+Simulator,Generate random sensor values within configured min/max range,Simulator,Diogo,Done,2
+Backend - MQTT & Sparkplug,Setup MQTT subscriber with auto-reconnect,Backend,Diogo,Done,3
+Backend - MQTT & Sparkplug,Implement Sparkplug B topic parser,Backend,Diogo,Done,3
+Backend - MQTT & Sparkplug,Implement Sparkplug B protobuf decoder,Backend,Diogo,Done,5
+Backend - MQTT & Sparkplug,Handle NBIRTH messages and register discovered sensors,Backend,Diogo,Done,5
+Backend - MQTT & Sparkplug,Handle NDATA messages and extract metric values,Backend,Diogo,Done,5
+Backend - MQTT & Sparkplug,Handle NDEATH messages and mark node as unavailable,Backend,Diogo,Done,3
+Backend - Persistence,Setup PostgreSQL database and schema migrations,Backend,Diogo,Done,3
+Backend - Persistence,Implement sensor repository (upsert and find),Backend,Diogo,Done,5
+Backend - Persistence,Implement metric reading repository (persist and paginated query),Backend,Diogo,Done,5
+Backend - Persistence,Implement in-memory node registry for sensor resolution,Backend,Diogo,Done,3
+Backend - API,Design GraphQL schema (queries and subscriptions),Backend,Diogo,Done,3
+Backend - API,Implement nodes query returning all known nodes with availability,Backend,Diogo,Done,3
+Backend - API,Implement sensors query filtered by group and node,Backend,Diogo,Done,2
+Backend - API,Implement readings query with configurable limit,Backend,Diogo,Done,3
+Backend - API,Implement live readings subscription via ZStream,Backend,Diogo,Done,8
+Backend - API,Implement in-memory broadcast for real-time metric fan-out,Backend,Diogo,Done,5
+Backend - API,Wire up GraphQL server and expose endpoint,Backend,Diogo,Done,3
+Backend - Cross-cutting,Implement logging aspect (AOP) with execution timing,Backend,Diogo,Done,3
+Backend - Cross-cutting,Centralize configuration (MQTT Database),Backend,Diogo,Done,2
+Frontend Web,Setup Flutter web project and dependency injection,Frontend,Hugo,Done,3
+Frontend Web,Implement GraphQL client with query and subscription support,Frontend,Hugo,Done,5
+Frontend Web,Design and implement app theme,Frontend,Hugo,Done,2
+Frontend Web,Implement app routing,Frontend,Hugo,Done,2
+Frontend Web,Implement initial screen with node and sensor listing,Frontend,Hugo,Done,5
+Frontend Web,Implement sensor card widget,Frontend,Hugo,Done,3
+Frontend Web,Implement live sensor gauge chart,Frontend,Hugo,Done,5
+Frontend Web,Implement time series chart widget,Frontend,Hugo,Done,5
+Frontend Web,Implement live time series side panel with close button,Frontend,Hugo,Done,5
+Frontend Web,Implement add sensor dialog with form validations,Frontend,Hugo,Done,5
+Frontend Web,Implement sensor config dialog,Frontend,Hugo,Done,3
+Frontend Web,Persist user preferences (selected sensors),Frontend,Hugo,Done,3
+Frontend Web,Implement app bar,Frontend,Hugo,Done,2
+Frontend Mobile,Setup Flutter mobile project and dependency injection,Frontend,Hugo,Done,3
+Frontend Mobile,Implement GraphQL client with query and subscription support,Frontend,Hugo,Done,5
+Frontend Mobile,Implement initial screen with sensor listing,Frontend,Hugo,Done,5
+Frontend Mobile,Implement sensor card widget,Frontend,Hugo,Done,3
+Frontend Mobile,Implement add sensor screen with sensor selection,Frontend,Hugo,Done,5
+Frontend Mobile,Implement live time series screen,Frontend,Hugo,Done,5
+Frontend Mobile,Implement time series chart widget,Frontend,Hugo,Done,5
+Frontend Mobile,Add internationalisation support (EN and PT),Frontend,Hugo,Done,3
+Frontend Mobile,Implement app bar,Frontend,Hugo,Done,2

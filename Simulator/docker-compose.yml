@@ -1,0 +1,36 @@
+services:
+  mosquitto:
+    image: eclipse-mosquitto:2.0.15
+    container_name: mosquitto
+    ports:
+      - '1883:1883'
+    volumes:
+      - ./mosquitto/config:/mosquitto/config
+      - ./mosquitto/data:/mosquitto/data
+      - ./mosquitto/log:/mosquitto/log
+    networks:
+      - net1
+    restart: always
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - mosquitto_sub -p 1883 -t 'topic' -C 1 -E -i probe -W 3
+      interval: 5s
+      timeout: 10s
+      start_period: 1s
+      retries: 3
+
+  simulator:
+    build: .
+    container_name: simulator
+    depends_on:
+      mosquitto:
+        condition: service_healthy
+    networks:
+      - net1
+    restart: on-failure
+
+networks:
+  net1:
+    driver: bridge
+

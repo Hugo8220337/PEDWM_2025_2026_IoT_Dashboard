@@ -1,0 +1,20 @@
+# Build artifacts
+build/
+vcpkg_installed/
+
+# Debug symbols
+**/*.pdb
+
+# Git
+.git
+.gitignore
+
+# Editor / IDE
+.vs/
+.vscode/
+**/*.user
+
+# Docker files (no need to copy these into the image)
+.dockerignore
+Dockerfile*
+docker-compose*

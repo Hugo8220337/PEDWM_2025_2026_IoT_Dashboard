@@ -1,0 +1,76 @@
+@startuml
+!theme plain
+skinparam BoxPadding 10
+skinparam ParticipantPadding 15
+skinparam maxMessageSize 150
+
+box "Camada de Simulação" #F9F9F9
+participant "Simulador C++\n(Sensores IoT)" as sensor
+end box
+
+box "Infraestrutura M2M" #E6F3FF
+queue "MQTT Broker\n(Mosquitto)" as mqtt
+end box
+
+box "Back-end" #FFF4E6
+participant "Back-end\n(Scala / ZIO)" as zio
+database "BD\n(PostgreSQL)" as db
+end box
+
+box "Front-end" #E6FFE6
+participant "Front-end Flutter\n(Web / Mobile)" as flutter
+end box
+
+== Fase 1: Inicialização e Subscrições (Assíncronas) ==
+zio -> mqtt: Subscribe (tópico: spBv1.0/+)
+note right of zio: O Back-end ouve\ncontinuamente o broker
+flutter -> zio: GraphQL Subscription (WebSockets)
+note right of flutter: O Cliente mantém a\nligação TCP aberta
+
+== Fase 2: NBIRTH (Descoberta e Registo de Nós) ==
+autonumber
+sensor -> mqtt: Publish NBIRTH (Protobuf)
+mqtt -> zio: Deliver
+activate zio
+
+zio -> zio: Evento: [NodeDiscovered]
+zio -> db: Upsert Sensors
+db --> zio: Sensors loaded to memory
+zio -> zio: logInfo: Node discovered (AOP)
+
+deactivate zio
+
+== Fase 3: NDATA (Fluxo Contínuo de Telemetria) ==
+autonumber 1
+sensor -> mqtt: Publish NDATA (Protobuf)
+mqtt -> zio: Deliver
+activate zio
+
+zio -> zio: Evento: [MetricReceived]\n• Validação Funcional (PF)
+zio -> zio: logDebug: metric value (AOP)
+
+par Operações Concorrentes (ZIO Fibers)
+    zio -> db: Insert (MetricReading)
+    
+    zio -> flutter: Emite Evento ReadingView\n(GraphQL Subscription)
+end
+deactivate zio
+
+activate flutter
+flutter -> flutter: GraphQL Client recebe evento na Stream
+flutter -> flutter: Widget re-renderiza UI\n(Dashboard e Gráficos)
+deactivate flutter
+
+== Fase 4: NDEATH (Desconexão Inesperada / Perda de Nó) ==
+autonumber 1
+sensor -> mqtt: Publish NDEATH
+mqtt -> zio: Deliver
+activate zio
+
+zio -> zio: Evento: [NodeLost]
+zio -> db: Update (setAvailability = false)
+zio -> zio: logInfo: Node lost (AOP)
+
+deactivate zio
+
+@enduml

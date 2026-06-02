@@ -1,0 +1,23 @@
+\section{Introdução} \label{sec:introducao}
+
+\subsection{Contextualização e Tema do Projeto}
+
+No cenário tecnológico atual, o quotidiano das pessoas e das organizações é cada vez mais rodeado por redes de dispositivos inteligentes e sensores que recolhem dados em tempo real. Estes sensores, que podem medir variáveis como a qualidade do ar, temperatura e humidade, geram fluxos contínuos de informação que exigem sistemas robustos capazes de os processar e transformar em conhecimento útil. 
+
+Foi com base nesta necessidade que o presente projeto foi desenvolvido, assumindo-se como um elemento integrador no âmbito da unidade curricular de Paradigmas Emergentes para o Desenvolvimento Web e Mobile do Mestrado em Engenharia Informática. O trabalho propõe o desenvolvimento de uma aplicação para a gestão e monitorização de uma rede de sensores IoT (Internet of Things) simulados. Para dar resposta a este desafio e garantir uma arquitetura resiliente e reativa, a solução foi desenhada com base em três pilares fundamentais exigidos: Programação Funcional, Programação Orientada a Aspetos e Programação \textit{Event-Driven} (Orientada a Eventos). O sistema permite a monitorização contínua destes dados em tempo real através de plataformas Web e Mobile.
+
+\subsection{Objetivos do Trabalho}
+
+Este trabalho prático tem como principal objetivo consolidar e integrar os conhecimentos adquiridos durante a unidade curricular, estimulando a exploração de conceitos avançados e tecnologias emergentes. 
+
+Para a concretização deste propósito principal, foram definidos os seguintes objetivos específicos:
+\begin{itemize}
+	\item \textbf{Aplicação de Paradigmas Emergentes:} Desenvolver a arquitetura do sistema aplicando os conceitos de Programação Funcional (garantindo imutabilidade e funções puras), Programação Orientada a Aspetos (separando preocupações transversais como \textit{logs} ou métricas) e Programação \textit{Event-Driven} (para lidar com o fluxo de dados dos sensores).
+	\item \textbf{Desenvolvimento Multiplataforma:} Construir a solução contendo, no mínimo, um componente \textit{front-end} para \textit{Web} e outro para ambiente \textit{Mobile}, garantindo a acessibilidade aos \textit{dashboards} de monitorização.
+	\item \textbf{Comunicação em Tempo Real e Eficiente:} Utilizar \textit{WebSockets} para o envio de eventos e alertas instantâneos para os clientes, e integrar \textit{GraphQL} para otimizar as consultas de dados, evitando \textit{over-fetching}.
+	\item \textbf{Gestão de Dispositivos IoT:} Capacitar a aplicação para gerir múltiplos sensores em simultâneo, processar as suas leituras e fornecer alertas em tempo real perante anomalias (e.g., aumentos súbitos de temperatura).
+\end{itemize}
+
+\subsection{Estrutura do Relatório}
+
+O presente relatório está organizado de forma a detalhar todo o processo de conceção e desenvolvimento da solução. A Secção \ref{sec:Tecnologias_Utilizadas} apresenta as tecnologias escolhidas para o \textit{front-end} e \textit{back-end}. A Secção \ref{sec:arquitetura_solucao} expõe a arquitetura da solução, acompanhada do respetivo diagrama arquitetural e dos diagramas UML necessários para o seu entendimento técnico. A Secção \ref{sec:paradigmas_implementacao} detalha o mapeamento dos objetivos com o trabalho desenvolvido, nomeadamente a forma como os paradigmas Funcional, Orientado a Aspetos e \textit{Event-Driven} foram implementados no código. A Secção \ref{sec:demonstracao} foca-se na demonstração das interfaces concebidas (Web e Mobile) e na exploração das suas funcionalidades. A Secção \ref{sec:desempenho_individual} apresenta um gráfico detalhado com os \textit{story points} atribuídos e concluídos ao longo do projeto, evidenciando o desempenho e esforço individual de cada estudante. Por fim, a Secção \ref{sec:conclusao} realiza uma breve súmula do trabalho, enumerando as conclusões retiradas e possíveis linhas de trabalho futuro.

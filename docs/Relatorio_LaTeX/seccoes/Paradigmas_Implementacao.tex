@@ -1,0 +1,80 @@
+\section{Paradigmas Implementados} \label{sec:paradigmas_implementacao}
+
+Esta secção resume quais os paradigmas utilizados na programação do projeto, onde foram implementados, e como foram programados.
+
+\subsection{Programação Funcional}
+O back-end em \textit{Scala} foi desenvolvido sobre a biblioteca \textit{ZIO HTTP}. A framework \textit{ZIO}, que serve de base para o \textit{ZIO HTTP}, tem como principal característica a forte dependência do paradigma funcional. Neste projeto, a programação funcional não foi apenas uma escolha de sintaxe, mas sim a base para garantir concorrência segura, tratamento de erros, previsibilidade no fluxo de dados e o cumprimento de um dos requisitos do enunciado.
+
+A implementação deste paradigma no back-end manifestou-se através dos seguintes princípios:
+\begin{itemize}
+	\item \textbf{Imutabilidade e Funções Puras:} Em vez de depender de variáveis de estado que mudam ao longo do tempo, o projeto utilizou estruturas de dados imutáveis (como as \textit{case classes} do Scala) para modelar a informação. Isto significa que quando um novo dado de um sensor é processado, o estado anterior não é alterado; em vez disso, é gerada uma nova representação dos dados. As funções desenvolvidas procuraram ser "puras", ou seja, para os mesmos argumentos de entrada, produzem sempre o mesmo resultado sem causar efeitos colaterais inesperados noutras partes do sistema.
+	
+	\item \textbf{Efeitos como Valores (\textit{Effects as Values}):} No paradigma imperativo tradicional, uma chamada à base de dados ou a leitura de um WebSocket acontece imediatamente. No paradigma funcional implementado com ZIO, qualquer operação que interaja com o mundo exterior (operações de I/O, pedidos HTTP) foi modelada como um valor do tipo \texttt{ZIO[R, E, A]}. Isto significa que as rotas HTTP e as subscrições de dados não executam ações imediatamente, mas sim constroem uma "receita" ou descrição do programa. A execução destes efeitos é delegada para o final do fluxo, garantindo um controlo total sobre falhas e recursos.
+\end{itemize}
+
+
+No \textit{front-end}, embora a linguagem \textit{Dart} seja essencialmente orientada a objetos, foram também aplicados princípios de programação funcional. Esta abordagem foi utilizada na camada dos repositórios para processar de forma reativa os fluxos de dados (\textit{streams}) contínuos provenientes das \textit{subscriptions} do \textit{GraphQL}.
+
+\begin{lstlisting}[language=Java, caption={Processamento funcional de uma \textit{Stream} de dados no \textit{front-end}}, label={lst:functional_frontend}]
+	// returns a stream that can be easily read by the viewmodel
+	return client
+	.subscribe(
+		SubscriptionOptions(
+			document: gql(subscription),
+			variables: {'sensorId': sensorId},
+		),
+	)
+	// Block every result that is not from the passed sensorId
+	.where((QueryResult result) {
+		if (result.hasException) return false;
+		final data = result.data?['liveReadings'];
+		if (data == null) return false;
+		return data['sensorId'] == sensorId;
+	})
+	.map((QueryResult result) {
+		final r = result.data!['liveReadings'];
+		return SensorData(
+			DateTime.fromMillisecondsSinceEpoch(r['timestamp']),
+			(r['value'] as num).toDouble(),
+		);
+	});
+\end{lstlisting}
+
+Conforme ilustrado no excerto de código \ref{lst:functional_frontend}, a manipulação dos eventos em tempo real é construída através de uma \textit{pipeline} declarativa focada em \textit{higher-order functions}. Em vez de recorrer a estruturas de controlo imperativas, o fluxo utiliza o método \texttt{where} para filtrar os eventos e o método \texttt{map} para projetar a resposta bruta num novo objeto imutável do tipo \texttt{SensorData}, garantindo uma transformação de dados pura e sem efeitos colaterais.
+
+
+\subsection{Programação Orientada a Aspetos}
+A programação orientada a aspetos (AOP) foi utilizada no back-end com o objetivo de isolar a lógica de monitorização e logging do fluxo principal de negócio. Esta funcionalidade foi implementada através de ZIO Aspects, uma funcionalidade nativa da biblioteca ZIO que permite intercetar e modificar o comportamento de efeitos sem alterar a lógica original.
+
+Num ambiente real de recolha de dados, a monitorização contínua do sistema é vital. O registo das métricas através deste aspeto não serve para testar a ligação de rede, mas sim para auditar a performance interna do servidor. Ao medir o tempo exato de execução das operações, é possível detetar estrangulamentos (como lentidão a inserir dados na base de dados) e identificar operações que falharam de forma isolada, tudo isto mantendo o código principal limpo e focado no processamento de dados.
+Os principais ficheiros que suportam esta funcionalidade são:
+
+\begin{itemize}
+	\item \textbf{LoggingAspect:} É o ficheiro central onde o aspeto é definido. Através da função timed, o aspeto interceta a execução, calcula o tempo decorrido, emite alertas de log caso a operação demore mais do que o limite aceitável estabelecido (200 milissegundos) ou emite erros caso a operação falhe.
+	
+	\item \textbf{SparkplugEventHandler: } É onde o aspeto é aplicado para monitorizar a entrada de dados. Ele regista o tempo que o sistema demora a descodificar as cargas úteis (payloads) do protocolo MQTT e a encaminhar as mensagens mediante o seu tipo (como o registo de novos nós ou a entrada de métricas).
+	
+	\item \textbf{SparkplugMessageProcessor:} O aspeto é aplicado neste pré-processador de eventos para medir a duração de operações críticas do ciclo de vida dos dados, nomeadamente o tempo necessário para guardar uma medição no repositório e para a transmitir (broadcast) aos clientes conectados.
+	
+	\item \textbf{InMemoryNodeRegistry:} Neste ficheiro, o aspeto serve para medir o tempo das operações mantidas na memória do sistema. Ele cronometra o tempo exato que o servidor demora a adicionar novos sensores, a procurar um sensor pelo nome, e a apagar sensores que se desconectaram.
+\end{itemize}
+
+
+\subsection{Programação Orientada a Eventos}
+
+A programação orientada a eventos foi utilizada no \textit{back-end} para gerir o fluxo contínuo dos dados dos sensores. Embora o servidor dependa do \textit{broker} MQTT, que atua como o motor externo responsável pela receção e distribuição das mensagens na rede, a aplicação foi desenvolvida para reagir a estes eventos de forma assíncrona e não bloqueante.
+
+O fluxo de eventos da aplicação funciona como uma linha de montagem reativa, baseada em \textit{ZIO Streams}, dividindo-se nas seguintes etapas:
+
+\begin{enumerate}
+	\item \textbf{Receção e Filas:} O \textit{back-end} subscreve os tópicos do \textit{broker} através do \texttt{MqttSubscriber}. Assim que uma nova mensagem chega, ela é imediatamente colocada numa fila de espera interna (\textit{Queue}). Permitindo com que exista desacoplamento, pois quem recebe as mensagens não fica bloqueado à espera de quem as processa.
+	
+	\item \textbf{Transformação:} O componente \texttt{SparkplugMessageProcessor} consome as mensagens dessa fila e atua como um tradutor. Ele converte mensagens MQTT em bruto para "Eventos de Domínio" compreensíveis pela aplicação (os \texttt{SparkplugEvent}), como a descoberta de um novo nó (\textit{NodeDiscovered}) ou a receção de uma nova leitura (\textit{MetricReceived}).
+	
+	\item \textbf{Processamento e Distribuição (\textit{Pub/Sub}):} O \texttt{SparkplugEventHandler} com base nestes eventos, guarda a informação na base de dados e, de seguida, publica o evento  (\texttt{MetricBroadcast}).
+\end{enumerate}
+
+
+No \textit{front-end}, o paradigma orientado a eventos também é utilizado. Através das \textit{subscriptions} do \textit{GraphQL}, tanto a aplicação \textit{web} como \textit{mobile} ficam permanentemente à espera de dados.
+
+Em vez de a aplicação perguntar repetidamente ao servidor se há novos dados (\textit{polling}), o \textit{front-end} atua de forma reativa. Sempre que o \textit{Hub} do servidor emite um novo evento de leitura, este é enviado para a aplicação. O \textit{viewmodel} interceta este evento e notifica a interface gráfica, fazendo com que os gráficos atualizem de forma imediata e automática.

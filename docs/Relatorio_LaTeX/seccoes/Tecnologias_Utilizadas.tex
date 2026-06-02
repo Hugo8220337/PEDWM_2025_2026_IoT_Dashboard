@@ -1,0 +1,22 @@
+\section{Tecnologias Utilizadas} \label{sec:Tecnologias_Utilizadas}
+
+\subsection{Flutter (Front-end Web e Mobile)}
+
+O motivo por detrás da escolha do Flutter para a realização deste projeto reside na flexibilidade do mesmo de poder ser facilmente compilado para diversas plataformas. A solução foi estruturada em duas aplicações: um \textit{dashboard Web} e aplicação \textit{Mobile}. Para evitar a duplicação de esforço e garantir a consistência, ambas as partes estão unidas por um \textit{package} interno partilhado, que centraliza as entidades, a gestão de estado e toda a lógal com o \textit{back-end}.
+
+Outro dos motivos para a escolha desta tecnologia foi a alta performance para renderizar o conteúdo no ecrã. Ao desenhar cada pixel diretamente no ecrã de forma independente do sistema operativo, o Flutter permite que gráficos de monitorização dos sensores e sejam executados de forma fluida, tanto num navegador \textit{Web} como num dispositivo \textit{Mobile} com recursos mais limitados.
+
+\subsection{Scala e ZIO (Back-end)}
+O Scala em conjunto com o ecossistema ZIO foi adotado de modo a cumprir os requisitos arquiteturais impostos para este projeto, nomeadamente a aplicação dos três paradigmas emergentes. 
+Em primeiro lugar, a linguagem Scala fomenta nativamente a programação funcional, garantindo que a validação e transformação dos dados dos sensores é feita através de funções puras e estruturas de dados imutáveis, eliminando efeitos secundários indesejados. 
+
+% TODO validar se usei ZStreams
+Em segundo lugar, a biblioteca ZIO oferece abstrações como as \textit{ZStreams}, que foram essenciais para implementar a programação orientada a eventos. Em vez de um modelo de pedido-resposta tradicional, o sistema processa um fluxo contínuo de leituras (\textit{pipeline} de eventos) proveniente dos sensores, filtrando anomalias e publicando alertas de forma reativa.
+
+% TODO validar se isto é verdade
+Por fim, o ZIO suporta nativamente a programação orientada a aspetos através de \textit{ZIO Aspects}. Isto permitiu isolar preocupações transversais, como o registo de \textit{logs} de todas as leituras e medição de métricas de latência. Assim, o código permanece limpo e focado apenas no processamento da telemetria, enquanto os aspetos são aplicados de forma declarativa e invisível. A alta concorrência é garantida através das \textit{Fibers} do ZIO, que, à semelhança das \textit{Goroutines}, são bastante leves e permitem ao servidor suportar milhares de eventos concorrentes com um consumo mínimo de memória.
+
+\subsection{C++ (Simulação de Sensores IoT)}
+Embora os sensores deste projeto sejam simulados, a escolha da linguagem C++ foi deliberada para manter a máxima fidelidade com os ambientes de Internet of Things (IoT) do mundo real. Na indústria, a maior parte dos microcontroladores (como o ecossistema Arduino ou o ESP32) é programada em C ou C++ devido ao controlo de baixo nível sobre a memória e o \textit{hardware}. 
+
+Ao desenvolver os simuladores em C++, o projeto mimetiza o comportamento, as restrições e o formato de dados que um sensor de temperatura, humidade ou qualidade do ar real emitiria. Estes simuladores atuam como os produtores iniciais no fluxo de dados, gerando eventos a uma taxa configurável que alimentam o \textit{broker} de mensagens e, consequentemente, todo o \textit{pipeline} reativo do \textit{back-end}.

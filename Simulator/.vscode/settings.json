@@ -1,0 +1,5 @@
+{
+    "code-runner.executorMap": {
+        "cpp": "cd $workspaceRoot && cmake --build build --preset default && .\\build\\Debug\\simulator.exe"
+    }
+}

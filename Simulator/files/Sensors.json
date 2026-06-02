@@ -1,0 +1,60 @@
+{
+  "group": "MyGroup",
+  "nodes": [
+    {
+      "name": "WeatherStation",
+      "tick_s": 5,
+      "sensors": [
+        {
+          "name": "AirSensor",
+          "variables": [
+            {
+              "name": "o2",
+              "type": "float",
+              "min": 19.0,
+              "max": 23.0,
+              "interval_s": 10
+            },
+            {
+              "name": "co2",
+              "type": "float",
+              "min": 300.0,
+              "max": 2000.0,
+              "interval_s": 30
+            }
+          ]
+        },
+        {
+          "name": "TempSensor",
+          "variables": [
+            {
+              "name": "temperature",
+              "type": "float",
+              "min": 15.0,
+              "max": 35.0,
+              "interval_s": 5
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Health",
+      "tick_s": 1,
+      "sensors": [
+        {
+          "name": "Health",
+          "variables": [
+            {
+              "name": "heartbeat",
+              "type": "float",
+              "min": 0.0,
+              "max": 1.0,
+              "interval_s": 1
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

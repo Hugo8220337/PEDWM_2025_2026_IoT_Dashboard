@@ -1,0 +1,31 @@
+FROM ubuntu:20.04 AS build
+
+ENV DEBIAN_FRONTEND=noninteractive
+
+RUN apt-get update && apt-get install -y curl git unzip xz-utils && rm -rf /var/lib/apt/lists/*
+
+RUN git clone https://github.com/flutter/flutter.git /flutter
+RUN git config --global --add safe.directory /flutter 
+ENV PATH="/flutter/bin:${PATH}"
+
+WORKDIR /app
+
+COPY common/pubspec.* ./common/
+COPY web/pubspec.* ./web/
+
+WORKDIR /app/web
+
+RUN flutter pub get
+
+WORKDIR /app
+COPY common ./common
+COPY web ./web
+
+WORKDIR /app/web
+
+RUN flutter config --enable-web
+RUN flutter build web
+
+FROM nginx:alpine-slim
+# Copia o build final para o Nginx
+COPY --from=build /app/web/build/web /usr/share/nginx/html

@@ -1,0 +1,21 @@
+{
+  // Enable format on save globally
+  "editor.formatOnSave": true,
+
+  // Set the default formatter for Dart files to the Dart extension
+  "editor.defaultFormatter": "Dart-Code.dart-code",
+
+  // Optional: Adjust line length (default is 80; increase for readability)
+  "dart.lineLength": 70,
+
+  "dart.flutterHotReloadOnSave": "all",
+
+  // Auto-fix Dart lint issues on save
+  "editor.codeActionsOnSave": {
+    "source.fixAll.dart": "explicit"
+  },
+
+  "[jsonc]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  }
+}

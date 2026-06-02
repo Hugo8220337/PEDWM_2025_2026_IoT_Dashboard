@@ -1,0 +1,93 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: pedwm
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - pedwm_net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d pedwm"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  mosquitto:
+    image: eclipse-mosquitto:2.0.15
+    ports:
+      - "1883:1883"
+    volumes:
+      - ./Simulator/mosquitto/config:/mosquitto/config
+      - ./Simulator/mosquitto/data:/mosquitto/data
+      - ./Simulator/mosquitto/log:/mosquitto/log
+    networks:
+      - pedwm_net
+    healthcheck:
+      test: ["CMD-SHELL", "mosquitto_sub -p 1883 -t 'topic' -C 1 -E -i probe -W 3"]
+      interval: 5s
+      timeout: 10s
+      start_period: 1s
+      retries: 3
+
+  backend:
+    build: ./backend
+    depends_on:
+      postgres:
+        condition: service_healthy
+      mosquitto:
+        condition: service_healthy
+    environment:
+      DB_URL: jdbc:postgresql://postgres:5432/pedwm
+      DB_USER: postgres
+      DB_PASSWORD: postgres
+      MQTT_BROKER_URL: tcp://mosquitto:1883
+      MQTT_CLIENT_ID: pedwm-backend
+      LOG_LEVEL: INFO
+      # For debugging
+      JAVA_TOOL_OPTIONS: "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005"
+    ports:
+      - "8088:8088"
+      - "5005:5005" # debug port
+    networks:
+      - pedwm_net
+    healthcheck:
+      test: ["CMD-SHELL", "bash -c 'echo > /dev/tcp/localhost/8088' 2>/dev/null && echo ok"]
+      interval: 10s
+      timeout: 5s
+      start_period: 60s
+      retries: 6
+
+  simulator:
+    build: ./Simulator
+    depends_on:
+      mosquitto:
+        condition: service_healthy
+      backend:
+        condition: service_healthy
+    networks:
+      - pedwm_net
+  web:
+    build: 
+      context: ./frontend            
+      dockerfile: web/Dockerfile
+    depends_on:
+      backend:
+        condition: service_healthy
+    environment:
+      GRAPHQL_URL: http://backend:8088/graphql
+    ports:
+      - "4242:80"
+    networks:
+      - pedwm_net
+
+volumes:
+  postgres_data:
+
+networks:
+  pedwm_net:
+    driver: bridge
