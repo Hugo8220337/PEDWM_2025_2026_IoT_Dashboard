@@ -39,7 +39,7 @@ Developed for the Master's in Informatics Engineering.
 ## Web Screenshots
 
 <p align="center">
-  <img src="./docs/images/Relatorio_LaTeX/web_data_temporal_chart.png" alt="Web Dashboard View" width="800"/>
+  <img src="docs/Relatorio_LaTeX/imagens/web_data_temporal_chart.png" alt="Web Dashboard View" width="800"/>
   <br>
   <em>Main Dashboard with real-time sensor gauges and time-series charts.</em>
 </p>
@@ -51,7 +51,7 @@ Developed for the Master's in Informatics Engineering.
 The system follows a reactive, event-driven architecture designed for high scalability and real-time updates without blocking threads.
 
 <p align="center">
-  <img src="./docs/images/Relatorio_LaTeX/architecture.jpg" alt="High-Level Architecture" width="800"/>
+  <img src="docs/Relatorio_LaTeX/imagens/architeture.jpg" alt="High-Level Architecture" width="800"/>
 </p>
 
 1. **Sensors / Simulator:** Publish telemetry data via MQTT using the Sparkplug B standard.
@@ -63,5 +63,5 @@ The system follows a reactive, event-driven architecture designed for high scala
 ## Sequence Diagram
 
 <p align="center">
-  <img src="./docs/images/Relatorio_LaTeX/messages_sequence_diagram.png.png" alt="Sequence Diagram" width="800"/>
+  <img src="docs/Relatorio_LaTeX/imagens/messages_sequence_diagram.png.png" alt="Sequence Diagram" width="800"/>
 </p>
